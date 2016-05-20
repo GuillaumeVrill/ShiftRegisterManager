@@ -59,7 +59,7 @@ class ShiftRegisterManager{
 	
 	//Fonction de réinitialisation des bus:
 	void clearBus(){
-		for(int i=taille_bus-1; i>=0; i--){
+		for(int i=0; i<taille_bus; i++){
 			bus[i]=0;
 		}
 		writeRegister();
@@ -74,10 +74,37 @@ class ShiftRegisterManager{
 		taille_bus = t_bus;
 	}
 	
+	int *getBus(){
+		return bus;
+	}
+	
 	void setBus(int *b, int tb){
 		for(int i=tb-1; i>=0; i--){
 			bus[i] = b[i];
-			//printf("%d \n",bus[i]);
+		}
+	}
+	
+	void setPinOn(int position){
+		if(position >= 0 && position < taille_bus){
+			bus[position] = 1;
+		}
+	}
+	
+	void setPinOff(int position){
+		if(position >= 0 && position < taille_bus){
+			bus[position] = 0;
+		}
+	}
+	
+	void setAllPinOn(){
+		for(int i=0; i<taille_bus; i++){
+			bus[i] = 1;
+		}
+	}
+	
+	void setAllPinOff(){
+		for(int i=0; i<taille_bus; i++){
+			bus[i] = 0;
 		}
 	}
 	
