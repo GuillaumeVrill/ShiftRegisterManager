@@ -23,7 +23,6 @@ class ShiftRegisterManager{
 		bus = new int[taille_bus];
 		init();
 		clearBus();
-		printf("init and clear \n");
 	}
 	
 	//Fonction d'initialisation des GPIO:
@@ -55,7 +54,7 @@ class ShiftRegisterManager{
 		//Passage des valeurs en simultanné sur le shift:
 		digitalWrite(RCLK_Pin, 1);
 		//Message de debug (si necessaire):
-		printf("write registers done \n");
+		//printf("write registers done \n");
 	}
 	
 	//Fonction de réinitialisation des bus:
@@ -78,7 +77,7 @@ class ShiftRegisterManager{
 	void setBus(int *b, int tb){
 		for(int i=tb-1; i>=0; i--){
 			bus[i] = b[i];
-			printf("%d \n",bus[i]);
+			//printf("%d \n",bus[i]);
 		}
 	}
 	
