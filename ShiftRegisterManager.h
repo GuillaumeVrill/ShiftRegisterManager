@@ -14,22 +14,26 @@ class ShiftRegisterManager{
 	int taille_bus;	//La taille du bus
 	
 	public:
-	//constructeur:
-	ShiftRegisterManager(int taille_bus, int Pin_valeur, int Pin_validateur, int Pin_suivant){
-		this.taille_bus = taille_bus;
-		this.SER_Pin = Pin_valeur;
-		this.RCLK_Pin = Pin_validateur;
-		this.SRCLK_Pin = Pin_suivant;
-		this.bus = new int[this.taille_bus];
+	ShiftRegisterManager(int taille_b, int Pin_valeur, int Pin_validateur, int Pin_suivant){
+		taille_bus = taille_b;
+		SER_Pin = Pin_valeur;
+		RCLK_Pin = Pin_validateur;
+		SRCLK_Pin = Pin_suivant;
+		bus = new int[taille_bus];
 		init();
 		clearBus();
 	}
 	
 	//Fonction d'initialisation des GPIO:
-	void init(){
+	int init(){
+		//initialisation de wiringPi
+		if(wiringPiSetup()==-1)
+			return 0;
+		
 		pinMode(SER_Pin, OUTPUT);
 		pinMode(RCLK_Pin, OUTPUT);
 		pinMode(SRCLK_Pin, OUTPUT);
+		return 1;
 	}
 	
 	//Fonction d'écriture du bus sur le shift register:
@@ -37,7 +41,7 @@ class ShiftRegisterManager{
 		//Mise en attente du shift:
 		digitalWrite(RCLK_Pin, 0);
 		//Préparation de la file:
-		for(int i=0; i<taille_bus; i++){
+		for(int i=taille_bus-1; i>=0; i--){
 			//En attente de valeur:
 			digitalWrite(SRCLK_Pin, 0);
 			int val = bus[i];
@@ -54,21 +58,60 @@ class ShiftRegisterManager{
 	
 	//Fonction de réinitialisation des bus:
 	void clearBus(){
-		for(int i=taille_bus-1; i>=0; i--){
+		for(int i=0; i<taille_bus; i++){
 			bus[i]=0;
 		}
-		writeRegisters();
+		writeRegister();
 	}
 	
-	//Fonctions de manipulation du Bus:
-	int getTaileBus(){
-		return this.taille_bus;
+	//Récupération de la taille du bus
+	int getTailleBus(){
+		return taille_bus;
 	}
 	
-	void seTailleBus(int t_bus){
-		this.taille_bus = t_bus;
+	//Paramétrage de la taille du bus
+	void setTailleBus(int t_bus){
+		taille_bus = t_bus;
 	}
 	
+	//Récupération du bus
+	int *getBus(){
+		return bus;
+	}
 	
+	//Paramétrage du bus
+	void setBus(int *b, int tb){
+		for(int i=tb-1; i>=0; i--){
+			bus[i] = b[i];
+		}
+	}
 	
-}
+	//Passage d'un pin à 1
+	void setPinOn(int position){
+		if(position >= 0 && position < taille_bus){
+			bus[position] = 1;
+		}
+	}
+	
+	//Passage d'un pin à 0
+	void setPinOff(int position){
+		if(position >= 0 && position < taille_bus){
+			bus[position] = 0;
+		}
+	}
+	
+	//Passage de tout le bus à 1
+	void setAllPinOn(){
+		for(int i=0; i<taille_bus; i++){
+			bus[i] = 1;
+		}
+	}
+	
+	//Passage de tout le bus à 0
+	void setAllPinOff(){
+		for(int i=0; i<taille_bus; i++){
+			bus[i] = 0;
+		}
+	}
+	
+};
