@@ -10,16 +10,23 @@ class ShiftRegisterManager{
 	int SER_Pin;	// Pin de VALEUR
 	int RCLK_Pin;	// Pin du VALIDATEUR
 	int SRCLK_Pin;	// Pin du passage au SUIVANT
-	int *bus;		//Le bus de valeur (la file)
-	int taille_bus;	//La taille du bus
+	int *bus;		// Le bus de valeur (la file)
+	int *real_bus;	// Le bus réel qui correspond à la réalisation physique
+	int bus_length;	// La taille du bus
+	int real_bus_length;	//La taille réelle du bus
 	
 	public:
-	ShiftRegisterManager(int taille_b, int Pin_valeur, int Pin_validateur, int Pin_suivant){
-		taille_bus = taille_b;
-		SER_Pin = Pin_valeur;
-		RCLK_Pin = Pin_validateur;
-		SRCLK_Pin = Pin_suivant;
-		bus = new int[taille_bus];
+	ShiftRegisterManager(int bus_l, int Pin_value, int Pin_validator, int Pin_next){
+		bus_length = bus_l;
+		SER_Pin = Pin_value;
+		RCLK_Pin = Pin_validator;
+		SRCLK_Pin = Pin_next;
+		bus = new int[bus_length];
+		real_bus_length = bus_length;
+		while(real_bus_length%8 != 0){
+			real_bus_length++;
+		}
+		real_bus = new int[real_bus_length];
 		init();
 		clearBus();
 	}
@@ -38,13 +45,20 @@ class ShiftRegisterManager{
 	
 	//Fonction d'écriture du bus sur le shift register:
 	void writeRegister(){
+		//récupération du bus réel et complétion du surplus avec des 0:
+		for(int i=0; i<bus_length; i++){
+			real_bus[i]=bus[i];
+		}
+		for(int i=bus_length; i<real_bus_length; i++){
+			real_bus[i] = 0;
+		}
 		//Mise en attente du shift:
 		digitalWrite(RCLK_Pin, 0);
 		//Préparation de la file:
-		for(int i=taille_bus-1; i>=0; i--){
+		for(int i=real_bus_length-1; i>=0; i--){
 			//En attente de valeur:
 			digitalWrite(SRCLK_Pin, 0);
-			int val = bus[i];
+			int val = real_bus[i];
 			//Ajout de la valeur:
 			digitalWrite(SER_Pin, val);
 			//On pousse les valeurs:
@@ -58,20 +72,20 @@ class ShiftRegisterManager{
 	
 	//Fonction de réinitialisation des bus:
 	void clearBus(){
-		for(int i=0; i<taille_bus; i++){
+		for(int i=0; i<bus_length; i++){
 			bus[i]=0;
 		}
 		writeRegister();
 	}
 	
 	//Récupération de la taille du bus
-	int getTailleBus(){
-		return taille_bus;
+	int getBusLength(){
+		return bus_length;
 	}
 	
 	//Paramétrage de la taille du bus
-	void setTailleBus(int t_bus){
-		taille_bus = t_bus;
+	void setBusLength(int bus_l){
+		bus_length = bus_l;
 	}
 	
 	//Récupération du bus
@@ -88,28 +102,28 @@ class ShiftRegisterManager{
 	
 	//Passage d'un pin à 1
 	void setPinOn(int position){
-		if(position >= 0 && position < taille_bus){
+		if(position >= 0 && position < bus_length){
 			bus[position] = 1;
 		}
 	}
 	
 	//Passage d'un pin à 0
 	void setPinOff(int position){
-		if(position >= 0 && position < taille_bus){
+		if(position >= 0 && position < bus_length){
 			bus[position] = 0;
 		}
 	}
 	
 	//Passage de tout le bus à 1
 	void setAllPinOn(){
-		for(int i=0; i<taille_bus; i++){
+		for(int i=0; i<bus_length; i++){
 			bus[i] = 1;
 		}
 	}
 	
 	//Passage de tout le bus à 0
 	void setAllPinOff(){
-		for(int i=0; i<taille_bus; i++){
+		for(int i=0; i<bus_length; i++){
 			bus[i] = 0;
 		}
 	}
