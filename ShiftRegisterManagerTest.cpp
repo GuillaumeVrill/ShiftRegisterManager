@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <wiringPi.h>
-#include <stdlib.h>
-#include <iostream>
 #include "ShiftRegisterManager.h"
 
 int main(void){
