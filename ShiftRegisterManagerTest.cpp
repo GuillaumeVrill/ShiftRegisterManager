@@ -17,6 +17,13 @@ int main(void){
 	srm->setPinOn(5);
 	srm->writeRegister();
 	delay(2000);
+	int *testBus = srm->getBus();
+	for(int i=0; i<6; i++){
+		testBus[i] = 1;
+	}
+	srm->setBus(testBus, 6);
+	srm->writeRegister();
+	delay(2000);
 	srm->setAllPinOff();
 	srm->writeRegister();
 	delay(2000);

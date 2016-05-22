@@ -7,13 +7,13 @@
 class ShiftRegisterManager{
 	
 	private:
-	int SER_Pin;	// Pin de VALEUR
-	int RCLK_Pin;	// Pin du VALIDATEUR
-	int SRCLK_Pin;	// Pin du passage au SUIVANT
-	int *bus;		// Le bus de valeur (la file)
-	int *real_bus;	// Le bus réel qui correspond à la réalisation physique
-	int bus_length;	// La taille du bus
-	int real_bus_length;	//La taille réelle du bus
+	int SER_Pin;	// VALUE Pin
+	int RCLK_Pin;	// VALIDATOR Pin
+	int SRCLK_Pin;	// Next Pin
+	int *bus;		// Value bus (contains the 1 and 0 values the user want to output)
+	int *real_bus;	// Real bus (length is dividable by 8), contain the values that will be printed, invisible for user
+	int bus_length;	// Bus length for user
+	int real_bus_length;	// Real bus length (invisible for the user, dividable by 8)
 	
 	public:
 	ShiftRegisterManager(int bus_l, int Pin_value, int Pin_validator, int Pin_next){
@@ -31,9 +31,9 @@ class ShiftRegisterManager{
 		clearBus();
 	}
 	
-	//Fonction d'initialisation des GPIO:
+	//Initialisation of the GPIO and libraries:
 	int init(){
-		//initialisation de wiringPi
+		//wiringPi init
 		if(wiringPiSetup()==-1)
 			return 0;
 		
@@ -43,34 +43,32 @@ class ShiftRegisterManager{
 		return 1;
 	}
 	
-	//Fonction d'écriture du bus sur le shift register:
+	//Writing function of the Shift Register (print the outputs)
 	void writeRegister(){
-		//récupération du bus réel et complétion du surplus avec des 0:
+		//updating the real bus to print the outputs:
 		for(int i=0; i<bus_length; i++){
 			real_bus[i]=bus[i];
 		}
 		for(int i=bus_length; i<real_bus_length; i++){
 			real_bus[i] = 0;
 		}
-		//Mise en attente du shift:
+		//put the shift waiting:
 		digitalWrite(RCLK_Pin, 0);
-		//Préparation de la file:
+		//preparing the values to output (reverse reading of the bus):
 		for(int i=real_bus_length-1; i>=0; i--){
-			//En attente de valeur:
+			//waiting for value:
 			digitalWrite(SRCLK_Pin, 0);
 			int val = real_bus[i];
-			//Ajout de la valeur:
+			//add value to the shift (actual output):
 			digitalWrite(SER_Pin, val);
-			//On pousse les valeurs:
+			//go to next value (next output):
 			digitalWrite(SRCLK_Pin, 1);
 		}
-		//Passage des valeurs en simultanné sur le shift:
+		//put the shift ON (displaying the outputs):
 		digitalWrite(RCLK_Pin, 1);
-		//Message de debug (si necessaire):
-		//printf("write registers done \n");
 	}
 	
-	//Fonction de réinitialisation des bus:
+	//reset the bus (user bus):
 	void clearBus(){
 		for(int i=0; i<bus_length; i++){
 			bus[i]=0;
@@ -78,50 +76,55 @@ class ShiftRegisterManager{
 		writeRegister();
 	}
 	
-	//Récupération de la taille du bus
+	//Get the bus length:
 	int getBusLength(){
 		return bus_length;
 	}
 	
-	//Paramétrage de la taille du bus
+	//set the bus length:
 	void setBusLength(int bus_l){
 		bus_length = bus_l;
 	}
 	
-	//Récupération du bus
+	//Get the bus
 	int *getBus(){
 		return bus;
 	}
 	
-	//Paramétrage du bus
-	void setBus(int *b, int tb){
-		for(int i=tb-1; i>=0; i--){
-			bus[i] = b[i];
+	//Set the bus
+	void setBus(int *b, int bus_l){
+		if(bus_l <= bus_length){
+			for(int i=bus_l-1; i>=0; i--){
+				bus[i] = b[i];
+			}
+		}
+		else{
+			printf("taille du bus incorrecte");
 		}
 	}
 	
-	//Passage d'un pin à 1
+	//Set an output ON (to 1):
 	void setPinOn(int position){
 		if(position >= 0 && position < bus_length){
 			bus[position] = 1;
 		}
 	}
 	
-	//Passage d'un pin à 0
+	//Set an output OFF (to 0):
 	void setPinOff(int position){
 		if(position >= 0 && position < bus_length){
 			bus[position] = 0;
 		}
 	}
 	
-	//Passage de tout le bus à 1
+	//Set all outputs ON:
 	void setAllPinOn(){
 		for(int i=0; i<bus_length; i++){
 			bus[i] = 1;
 		}
 	}
 	
-	//Passage de tout le bus à 0
+	//Set all outputs OFF:
 	void setAllPinOff(){
 		for(int i=0; i<bus_length; i++){
 			bus[i] = 0;
