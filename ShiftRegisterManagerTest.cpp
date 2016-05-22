@@ -8,7 +8,7 @@ int main(void){
 	
 	ShiftRegisterManager *srm = new ShiftRegisterManager(8, 7, 6, 5);
 	
-	int *b = new int[8];
+	/*int *b = new int[8];
 	b[0] = 1;
 	b[1] = 1;
 	b[2] = 0;
@@ -24,7 +24,21 @@ int main(void){
 		b[i] = 0;
 	}
 	srm->setBus(b, 8);
+	srm->writeRegister();*/
+	
+	srm->setAllPinOff();
 	srm->writeRegister();
+	delay(2000);
+	srm->setAllPinOn();
+	srm->setPinOff(2);
+	srm->setPinOff(3);
+	srm->setPinOff(4);
+	srm->setPinOff(5);
+	srm->writeRegister();
+	delay(2000);
+	srm->setAllPinOff();
+	srm->writeRegister();
+	delay(2000);
 	
 	return 0;
 	

@@ -65,43 +65,50 @@ class ShiftRegisterManager{
 		writeRegister();
 	}
 	
-	//Fonctions de manipulation du Bus:
+	//Récupération de la taille du bus
 	int getTailleBus(){
 		return taille_bus;
 	}
 	
+	//Paramétrage de la taille du bus
 	void setTailleBus(int t_bus){
 		taille_bus = t_bus;
 	}
 	
+	//Récupération du bus
 	int *getBus(){
 		return bus;
 	}
 	
+	//Paramétrage du bus
 	void setBus(int *b, int tb){
 		for(int i=tb-1; i>=0; i--){
 			bus[i] = b[i];
 		}
 	}
 	
+	//Passage d'un pin à 1
 	void setPinOn(int position){
 		if(position >= 0 && position < taille_bus){
 			bus[position] = 1;
 		}
 	}
 	
+	//Passage d'un pin à 0
 	void setPinOff(int position){
 		if(position >= 0 && position < taille_bus){
 			bus[position] = 0;
 		}
 	}
 	
+	//Passage de tout le bus à 1
 	void setAllPinOn(){
 		for(int i=0; i<taille_bus; i++){
 			bus[i] = 1;
 		}
 	}
 	
+	//Passage de tout le bus à 0
 	void setAllPinOff(){
 		for(int i=0; i<taille_bus; i++){
 			bus[i] = 0;
