@@ -17,18 +17,11 @@ class ShiftRegisterManager{
 	
 	public:
 	ShiftRegisterManager(int bus_l, int Pin_value, int Pin_validator, int Pin_next){
-		bus_length = bus_l;
 		SER_Pin = Pin_value;
 		RCLK_Pin = Pin_validator;
 		SRCLK_Pin = Pin_next;
-		bus = new int[bus_length];
-		real_bus_length = bus_length;
-		while(real_bus_length%8 != 0){
-			real_bus_length++;
-		}
-		real_bus = new int[real_bus_length];
 		init();
-		clearBus();
+		setBusLength(bus_l);
 	}
 	
 	//Initialisation of the GPIO and libraries:
@@ -84,23 +77,13 @@ class ShiftRegisterManager{
 	//set the bus length:
 	void setBusLength(int bus_l){
 		bus_length = bus_l;
-	}
-	
-	//Get the bus
-	int *getBus(){
-		return bus;
-	}
-	
-	//Set the bus
-	void setBus(int *b, int bus_l){
-		if(bus_l <= bus_length){
-			for(int i=bus_l-1; i>=0; i--){
-				bus[i] = b[i];
-			}
+		bus = new int[bus_length];
+		real_bus_length = bus_length;
+		while(real_bus_length%8 != 0){
+			real_bus_length++;
 		}
-		else{
-			printf("taille du bus incorrecte");
-		}
+		real_bus = new int[real_bus_length];
+		clearBus();
 	}
 	
 	//Set an output ON (to 1):
